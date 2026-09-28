@@ -6,45 +6,28 @@ use App\Models\Document;
 use Illuminate\Database\Seeder;
 
 /**
- * Importa as atas e agendas já existentes em atas/ e agenda/ (na raiz do
- * projeto, fora deste app Laravel) para dentro do banco do SGM Gerencial,
- * para que fiquem visíveis na aba "Atas e Agendas" desde o primeiro deploy.
+ * Importa o acervo histórico de atas e agendas (empacotado em
+ * database/seeders/data/documentos.json, exportado do ambiente local em
+ * 28/09/2026) para dentro do banco do SGM Gerencial — inclusive em produção,
+ * onde as pastas atas/ e agenda/ do repositório principal não existem.
+ * Documentos novos, gerados depois do lançamento, entram pela própria tela
+ * de upload do sistema, não por este seeder.
  */
 class DocumentImportSeeder extends Seeder
 {
     public function run(): void
     {
-        $this->importarPasta(base_path('../atas'), 'ata');
-        $this->importarPasta(base_path('../agenda'), 'agenda');
-    }
-
-    private function importarPasta(string $pasta, string $tipo): void
-    {
-        $pasta = realpath($pasta);
-        if (! $pasta) {
+        $arquivo = base_path('database/seeders/data/documentos.json');
+        if (! file_exists($arquivo)) {
             return;
         }
 
-        foreach (glob($pasta.'/*.md') as $arquivo) {
-            $nome = basename($arquivo, '.md');
-            if (stripos($nome, '_TEMPLATE') !== false) {
-                continue;
-            }
+        $documentos = json_decode(file_get_contents($arquivo), true) ?: [];
 
-            if (! preg_match('/^(\d{4}-\d{2}-\d{2})/', $nome, $m)) {
-                continue;
-            }
-            $data = $m[1];
-
-            $conteudo = file_get_contents($arquivo);
-            $titulo = $nome;
-            if (preg_match('/^#\s+(.+)$/m', $conteudo, $tm)) {
-                $titulo = trim($tm[1]);
-            }
-
+        foreach ($documentos as $doc) {
             Document::updateOrCreate(
-                ['tipo' => $tipo, 'data' => $data, 'titulo' => $titulo],
-                ['conteudo' => $conteudo]
+                ['tipo' => $doc['tipo'], 'data' => $doc['data'], 'titulo' => $doc['titulo']],
+                ['conteudo' => $doc['conteudo']]
             );
         }
     }
