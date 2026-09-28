@@ -13,32 +13,7 @@
   <div class="card">
     <h2 style="margin: 0 0 14px; font-size: 1rem;">Tarefas pendentes de hoje</h2>
 
-    @forelse ($tarefas as $tarefa)
-      <div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; {{ !$loop->last ? 'border-bottom: 1px solid var(--border);' : '' }}">
-        <form method="POST" action="{{ route('tarefas.concluir', $tarefa) }}">
-          @csrf
-          @method('PATCH')
-          <button type="submit" title="{{ $tarefa->concluida ? 'Marcar como pendente' : 'Marcar como concluída' }}"
-                  style="width: 20px; height: 20px; border-radius: 6px; border: 1px solid var(--border); background: {{ $tarefa->concluida ? 'var(--gradient)' : 'transparent' }}; cursor: pointer;">
-          </button>
-        </form>
-
-        <div style="flex: 1;">
-          <p style="margin: 0; {{ $tarefa->concluida ? 'text-decoration: line-through; color: var(--ink-faint);' : '' }}">{{ $tarefa->titulo }}</p>
-          @if ($tarefa->descricao)
-            <p style="margin: 2px 0 0; font-size: 0.82rem; color: var(--ink-faint);">{{ $tarefa->descricao }}</p>
-          @endif
-        </div>
-
-        @if ($tarefa->data_prevista)
-          <span style="font-size: 0.85rem; color: {{ !$tarefa->concluida && $tarefa->data_prevista->isPast() && !$tarefa->data_prevista->isToday() ? 'var(--danger)' : 'var(--ink-soft)' }};">
-            {{ $tarefa->data_prevista->format('d/m/Y') }}
-          </span>
-        @endif
-      </div>
-    @empty
-      <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">Nenhuma tarefa pendente para hoje.</p>
-    @endforelse
+    @include('tarefas._lista', ['tarefas' => $tarefas, 'usuarios' => $usuarios])
   </div>
 
   <p style="margin: 18px 0 0; font-size: 0.85rem;">

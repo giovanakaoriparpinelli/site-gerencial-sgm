@@ -32,22 +32,9 @@
           <p style="margin: 2px 0 0; font-size: 0.82rem; color: var(--ink-faint);">{{ $usuario->email }}</p>
         </div>
 
-        <details style="position: relative;">
-          <summary class="icon-btn" style="list-style: none; cursor: pointer;" title="Editar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16.5 3.5 4 4L8 20H4v-4Z"/></svg>
-          </summary>
-          <div style="position: absolute; right: 0; z-index: 10; margin-top: 8px; width: 300px; background: #241247; border: 1px solid var(--border); border-radius: 12px; padding: 16px;">
-            <form method="POST" action="{{ route('usuarios.update', $usuario) }}">
-              @csrf
-              @method('PUT')
-              <label class="field-label">Nome</label>
-              <input type="text" name="name" value="{{ $usuario->name }}" required class="field" style="margin-bottom: 10px;">
-              <label class="field-label">E-mail</label>
-              <input type="email" name="email" value="{{ $usuario->email }}" required class="field" style="margin-bottom: 14px;">
-              <button type="submit" class="btn-primary" style="width: 100%;">Salvar</button>
-            </form>
-          </div>
-        </details>
+        <button type="button" class="icon-btn abrir-usuario" data-id="{{ $usuario->id }}" title="Editar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16.5 3.5 4 4L8 20H4v-4Z"/></svg>
+        </button>
 
         @if ($usuario->id !== auth()->id())
           <form method="POST" action="{{ route('usuarios.destroy', $usuario) }}" onsubmit="return confirm('Remover {{ $usuario->name }}? As tarefas criadas por essa pessoa também serão removidas.');">
@@ -63,4 +50,51 @@
       <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">Nenhum funcionário cadastrado.</p>
     @endforelse
   </div>
+
+  <script type="application/json" id="usuarios-data">
+    {!! json_encode($usuarios->keyBy('id')->map(fn ($u) => ['id' => $u->id, 'name' => $u->name, 'email' => $u->email])) !!}
+  </script>
+
+  <div class="modal-backdrop" id="modal-usuario">
+    <div class="modal">
+      <span class="modal-close" data-close="modal-usuario">&times;</span>
+      <h2 style="margin: 0 0 16px; font-size: 1.1rem; font-family: 'Fraunces', Georgia, serif;">Editar funcionário</h2>
+      <form method="POST" id="form-usuario">
+        @csrf
+        @method('PUT')
+        <label class="field-label">Nome</label>
+        <input type="text" name="name" id="u_name" required class="field" style="margin-bottom: 12px;">
+        <label class="field-label">E-mail</label>
+        <input type="email" name="email" id="u_email" required class="field" style="margin-bottom: 18px;">
+        <button type="submit" class="btn-primary" style="width: 100%;">Salvar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var usuariosData = JSON.parse(document.getElementById('usuarios-data').textContent || '{}');
+
+      function abrirModal(id) { document.getElementById(id).classList.add('open'); }
+      function fecharModal(id) { document.getElementById(id).classList.remove('open'); }
+
+      document.querySelectorAll('[data-close="modal-usuario"]').forEach(function (el) {
+        el.addEventListener('click', function () { fecharModal('modal-usuario'); });
+      });
+      document.getElementById('modal-usuario').addEventListener('click', function (e) {
+        if (e.target === this) fecharModal('modal-usuario');
+      });
+
+      document.querySelectorAll('.abrir-usuario').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var u = usuariosData[btn.getAttribute('data-id')];
+          if (!u) return;
+          document.getElementById('u_name').value = u.name || '';
+          document.getElementById('u_email').value = u.email || '';
+          document.getElementById('form-usuario').action = '/gerencial/usuarios/' + u.id;
+          abrirModal('modal-usuario');
+        });
+      });
+    })();
+  </script>
 @endsection

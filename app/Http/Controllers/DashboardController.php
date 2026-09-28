@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Document;
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -11,7 +12,8 @@ class DashboardController extends Controller
 {
     public function index(Request $request): View
     {
-        $tarefas = Task::where(function ($q) {
+        $tarefas = Task::with(['criador', 'responsavel'])
+            ->where(function ($q) {
                 $q->where('concluida', false)->whereDate('data_prevista', '<=', today());
             })
             ->orWhere(function ($q) {
@@ -25,6 +27,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'tarefas' => $tarefas,
+            'usuarios' => User::orderBy('name')->get(),
             'hoje' => today(),
             'agendaHoje' => $agendaHoje,
             'pendenciasAgenda' => $agendaHoje ? $agendaHoje->itensChecklist() : [],
