@@ -63,6 +63,16 @@
             </button>
           </form>
           <p style="margin: 0; flex: 1; {{ $item['concluido'] ? 'text-decoration: line-through; color: var(--ink-faint);' : '' }}">{{ $item['texto'] }}</p>
+          @if (! $item['concluido'])
+            <form method="POST" action="{{ route('tarefas.store') }}">
+              @csrf
+              <input type="hidden" name="titulo" value="{{ $item['texto'] }}">
+              <input type="hidden" name="data_prevista" value="{{ $hoje->format('Y-m-d') }}">
+              <button type="submit" class="icon-btn" title="Criar tarefa a partir desta pendência">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+            </form>
+          @endif
         </div>
       @empty
         <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">A agenda de hoje não tem itens de checklist.</p>

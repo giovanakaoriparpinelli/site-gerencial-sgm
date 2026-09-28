@@ -61,51 +61,127 @@
           @endforeach
         </select>
       </div>
+      <input type="hidden" name="visualizacao" value="{{ $visualizacao }}">
       <button type="submit" class="btn-ghost">Filtrar</button>
+
+      <div style="display: flex; gap: 6px; margin-left: auto;">
+        <a href="{{ route('clientes.index', array_merge(request()->except('page'), ['visualizacao' => 'grade'])) }}"
+           class="icon-btn" style="{{ $visualizacao === 'grade' ? 'border-color: var(--accent); color: var(--ink);' : '' }}" title="Visualizar em grade">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+        </a>
+        <a href="{{ route('clientes.index', array_merge(request()->except('page'), ['visualizacao' => 'lista'])) }}"
+           class="icon-btn" style="{{ $visualizacao === 'lista' ? 'border-color: var(--accent); color: var(--ink);' : '' }}" title="Visualizar em lista">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </a>
+      </div>
     </form>
   </div>
 
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
-    @forelse ($clientes as $cliente)
-      <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
-          <button type="button" class="abrir-cliente" data-id="{{ $cliente->id }}"
-                  style="background: none; border: none; padding: 0; text-align: left; cursor: pointer; color: var(--ink); font-weight: 700; font-size: 1rem; font-family: 'Fraunces', Georgia, serif;">
-            {{ $cliente->empresa }}
-          </button>
-          <div style="display: flex; gap: 6px; flex-shrink: 0;">
-            <button type="button" class="icon-btn abrir-cliente" data-id="{{ $cliente->id }}" title="Editar">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16.5 3.5 4 4L8 20H4v-4Z"/></svg>
+  @if ($visualizacao === 'lista')
+    <div class="card" style="padding: 0; overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+        <thead>
+          <tr style="text-align: left;">
+            <th style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">Empresa</th>
+            <th style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">Segmento</th>
+            <th style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">WhatsApp</th>
+            <th style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">Etapa</th>
+            <th style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">Último contato</th>
+            <th style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">Próxima ação</th>
+            <th style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse ($clientes as $cliente)
+            <tr>
+              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border);">
+                <button type="button" class="abrir-cliente" data-id="{{ $cliente->id }}"
+                        style="background: none; border: none; padding: 0; cursor: pointer; color: var(--ink); font-weight: 700;">
+                  {{ $cliente->empresa }}
+                </button>
+              </td>
+              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">{{ $cliente->segmento ?: '—' }}</td>
+              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-soft);">{{ $cliente->whatsapp ?: '—' }}</td>
+              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border);">
+                <span style="display: inline-block; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.72rem; color: var(--ink-soft);">
+                  {{ $etapas[$cliente->etapa_funil]['label'] ?? $cliente->etapa_funil }}
+                </span>
+              </td>
+              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-faint);">{{ $cliente->data_ultimo_contato?->format('d/m/Y') ?? '—' }}</td>
+              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border); color: var(--ink-faint);">{{ $cliente->data_proxima_acao?->format('d/m/Y') ?? '—' }}</td>
+              <td style="padding: 10px 14px; border-bottom: 1px solid var(--border);">
+                <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                  <button type="button" class="icon-btn abrir-cliente" data-id="{{ $cliente->id }}" title="Editar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16.5 3.5 4 4L8 20H4v-4Z"/></svg>
+                  </button>
+                  <button type="button" class="icon-btn abrir-checklist" data-id="{{ $cliente->id }}" title="Checklist">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11 13.5l4-4.5"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+                  </button>
+                  <a href="{{ route('clientes.exportar', $cliente) }}" class="icon-btn" title="Exportar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 3.5-3.5M12 15l-3.5-3.5"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+                  </a>
+                  <form method="POST" action="{{ route('clientes.destroy', $cliente) }}" onsubmit="return confirm('Remover este cliente?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="icon-btn" title="Excluir">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></svg>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          @empty
+            <tr><td colspan="7" style="padding: 14px; color: var(--ink-faint);">Nenhum cliente encontrado.</td></tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  @else
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+      @forelse ($clientes as $cliente)
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+            <button type="button" class="abrir-cliente" data-id="{{ $cliente->id }}"
+                    style="background: none; border: none; padding: 0; text-align: left; cursor: pointer; color: var(--ink); font-weight: 700; font-size: 1rem; font-family: 'Fraunces', Georgia, serif;">
+              {{ $cliente->empresa }}
             </button>
-            <button type="button" class="icon-btn abrir-checklist" data-id="{{ $cliente->id }}" title="Checklist">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11 13.5l4-4.5"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
-            </button>
-            <form method="POST" action="{{ route('clientes.destroy', $cliente) }}" onsubmit="return confirm('Remover este cliente?');">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="icon-btn" title="Excluir">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></svg>
+            <div style="display: flex; gap: 6px; flex-shrink: 0;">
+              <button type="button" class="icon-btn abrir-cliente" data-id="{{ $cliente->id }}" title="Editar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16.5 3.5 4 4L8 20H4v-4Z"/></svg>
               </button>
-            </form>
+              <button type="button" class="icon-btn abrir-checklist" data-id="{{ $cliente->id }}" title="Checklist">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11.5 11 13.5l4-4.5"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+              </button>
+              <a href="{{ route('clientes.exportar', $cliente) }}" class="icon-btn" title="Exportar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0 3.5-3.5M12 15l-3.5-3.5"/><path d="M5 17v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/></svg>
+              </a>
+              <form method="POST" action="{{ route('clientes.destroy', $cliente) }}" onsubmit="return confirm('Remover este cliente?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="icon-btn" title="Excluir">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13"/></svg>
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <p style="margin: 8px 0 0; font-size: 0.85rem; color: var(--ink-soft);">{{ $cliente->segmento ?: '—' }}</p>
+          <p style="margin: 4px 0 0; font-size: 0.85rem; color: var(--ink-soft);">{{ $cliente->whatsapp ?: '—' }}</p>
+
+          <span style="display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.75rem; color: var(--ink-soft);">
+            {{ $etapas[$cliente->etapa_funil]['label'] ?? $cliente->etapa_funil }}
+          </span>
+
+          <div style="display: flex; justify-content: space-between; margin-top: 14px; font-size: 0.78rem; color: var(--ink-faint);">
+            <span>Último contato: {{ $cliente->data_ultimo_contato?->format('d/m/Y') ?? '—' }}</span>
+            <span>Próxima ação: {{ $cliente->data_proxima_acao?->format('d/m/Y') ?? '—' }}</span>
           </div>
         </div>
-
-        <p style="margin: 8px 0 0; font-size: 0.85rem; color: var(--ink-soft);">{{ $cliente->segmento ?: '—' }}</p>
-        <p style="margin: 4px 0 0; font-size: 0.85rem; color: var(--ink-soft);">{{ $cliente->whatsapp ?: '—' }}</p>
-
-        <span style="display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); font-size: 0.75rem; color: var(--ink-soft);">
-          {{ $etapas[$cliente->etapa_funil]['label'] ?? $cliente->etapa_funil }}
-        </span>
-
-        <div style="display: flex; justify-content: space-between; margin-top: 14px; font-size: 0.78rem; color: var(--ink-faint);">
-          <span>Último contato: {{ $cliente->data_ultimo_contato?->format('d/m/Y') ?? '—' }}</span>
-          <span>Próxima ação: {{ $cliente->data_proxima_acao?->format('d/m/Y') ?? '—' }}</span>
-        </div>
-      </div>
-    @empty
-      <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">Nenhum cliente encontrado.</p>
-    @endforelse
-  </div>
+      @empty
+        <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">Nenhum cliente encontrado.</p>
+      @endforelse
+    </div>
+  @endif
 
   {{-- Dados de todos os clientes (para preencher os modais via JS, sem round-trip ao servidor) --}}
   <script type="application/json" id="clientes-data">
@@ -317,7 +393,11 @@
       }
 
       document.querySelectorAll('.abrir-checklist').forEach(function (btn) {
-        btn.addEventListener('click', function () { abrirChecklistPorId(btn.getAttribute('data-id')); });
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-id');
+          var cliente = clientesData[id];
+          abrirChecklistPorId(id, cliente ? cliente.etapa_funil : null);
+        });
       });
 
       document.querySelectorAll('.chk-tab-btn').forEach(function (btn) {

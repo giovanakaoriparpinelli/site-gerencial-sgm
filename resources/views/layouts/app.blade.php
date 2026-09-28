@@ -222,6 +222,12 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v5h5M9 13h6M9 17h6"/></svg>
           Atas e Agendas
         </a>
+
+        <p class="nav-label">Gerencial</p>
+        <a href="{{ route('usuarios.index') }}" class="nav-item {{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8.5" cy="8" r="3.2"/><path d="M2.5 20a6 6 0 0 1 12 0"/><path d="M16 4.2a3.2 3.2 0 0 1 0 6.1"/><path d="M17.5 13.2c2.2.5 3.8 2.4 3.8 5.8"/><path d="M20 3.5v4M22 5.5h-4"/></svg>
+          Usuários
+        </a>
       </nav>
 
       <div class="sidebar-foot">

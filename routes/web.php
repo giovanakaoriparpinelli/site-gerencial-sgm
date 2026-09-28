@@ -7,6 +7,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FunilController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -38,8 +39,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/clientes/{client}', [ClientController::class, 'update'])->name('clientes.update');
     Route::delete('/clientes/{client}', [ClientController::class, 'destroy'])->name('clientes.destroy');
     Route::put('/clientes/{client}/checklist/{etapa}', [ClientController::class, 'salvarChecklist'])->name('clientes.checklist');
+    Route::get('/clientes/{client}/exportar', [ClientController::class, 'exportar'])->name('clientes.exportar');
 
     Route::get('/funil', [FunilController::class, 'index'])->name('funil.index');
+
+    Route::get('/gerencial/usuarios', [UserController::class, 'index'])->name('usuarios.index');
+    Route::post('/gerencial/usuarios', [UserController::class, 'store'])->name('usuarios.store');
+    Route::put('/gerencial/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
+    Route::delete('/gerencial/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 
     Route::get('/documentos', [DocumentController::class, 'index'])->name('documentos.index');
     Route::post('/documentos', [DocumentController::class, 'store'])->name('documentos.store');

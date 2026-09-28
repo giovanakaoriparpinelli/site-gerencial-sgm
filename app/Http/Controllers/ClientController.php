@@ -33,10 +33,13 @@ class ClientController extends Controller
 
         $clientes = $query->orderByDesc('updated_at')->get();
 
+        $visualizacao = $request->get('visualizacao', 'grade') === 'lista' ? 'lista' : 'grade';
+
         return view('clientes.index', [
             'clientes' => $clientes,
             'busca' => $busca,
             'etapaFiltro' => $etapa,
+            'visualizacao' => $visualizacao,
             'etapas' => Funil::etapas(),
             'usuarios' => User::orderBy('name')->get(),
             'abrirCliente' => (int) $request->get('cliente', 0),
@@ -67,6 +70,19 @@ class ClientController extends Controller
         $client->delete();
 
         return back()->with('status', 'Cliente removido.');
+    }
+
+    public function exportar(Client $client)
+    {
+        $client->load('responsavel', 'checklists');
+
+        $conteudo = $client->paraMarkdown();
+        $nomeArquivo = 'cliente-'.\Illuminate\Support\Str::slug($client->empresa).'.md';
+
+        return response($conteudo, 200, [
+            'Content-Type' => 'text/markdown; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$nomeArquivo.'"',
+        ]);
     }
 
     public function salvarChecklist(Request $request, Client $client, string $etapa): RedirectResponse
