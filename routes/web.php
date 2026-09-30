@@ -51,6 +51,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/documentos', [DocumentController::class, 'index'])->name('documentos.index');
     Route::post('/documentos', [DocumentController::class, 'store'])->name('documentos.store');
     Route::get('/documentos/{documento}', [DocumentController::class, 'show'])->name('documentos.show');
+    Route::get('/documentos/{documento}/editar', [DocumentController::class, 'edit'])->name('documentos.edit');
+    Route::put('/documentos/{documento}', [DocumentController::class, 'update'])->name('documentos.update');
     Route::patch('/documentos/{documento}/checklist/{indice}', [DocumentController::class, 'alternarChecklist'])->name('documentos.checklist');
     Route::delete('/documentos/{documento}', [DocumentController::class, 'destroy'])->name('documentos.destroy');
 });

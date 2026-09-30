@@ -65,6 +65,25 @@ class DocumentController extends Controller
         return redirect()->route('documentos.show', $documento)->with('status', 'Documento adicionado.');
     }
 
+    public function edit(Document $documento): View
+    {
+        return view('documentos.edit', ['documento' => $documento]);
+    }
+
+    public function update(Request $request, Document $documento): RedirectResponse
+    {
+        $data = $request->validate([
+            'tipo' => ['required', 'in:ata,agenda'],
+            'data' => ['required', 'date'],
+            'titulo' => ['required', 'string', 'max:255'],
+            'conteudo' => ['required', 'string'],
+        ]);
+
+        $documento->update($data);
+
+        return redirect()->route('documentos.show', $documento)->with('status', 'Documento atualizado.');
+    }
+
     public function alternarChecklist(Document $documento, int $indice): RedirectResponse
     {
         $documento->alternarItemChecklist($indice);

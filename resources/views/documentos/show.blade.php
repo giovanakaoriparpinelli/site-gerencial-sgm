@@ -40,11 +40,14 @@
     {!! \App\Support\Markdown::toHtml($documento->conteudo) !!}
   </div>
 
-  <form method="POST" action="{{ route('documentos.destroy', $documento) }}" onsubmit="return confirm('Remover este documento?');" style="margin-top: 18px;">
-    @csrf
-    @method('DELETE')
-    <button type="submit" class="btn-ghost">Excluir documento</button>
-  </form>
+  <div style="display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap;">
+    <a href="{{ route('documentos.edit', $documento) }}" class="btn-ghost" style="display: inline-block;">Editar documento</a>
+    <form method="POST" action="{{ route('documentos.destroy', $documento) }}" onsubmit="return confirm('Remover este documento? Esta ação não pode ser desfeita.');">
+      @csrf
+      @method('DELETE')
+      <button type="submit" class="btn-ghost">Excluir documento</button>
+    </form>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script>
