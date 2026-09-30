@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/gerencial/usuarios', [UserController::class, 'index'])->name('usuarios.index');
     Route::post('/gerencial/usuarios', [UserController::class, 'store'])->name('usuarios.store');
     Route::put('/gerencial/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
+    Route::post('/gerencial/usuarios/{user}/resetar-senha', [UserController::class, 'resetarSenha'])->name('usuarios.resetar-senha');
     Route::delete('/gerencial/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 
     Route::get('/documentos', [DocumentController::class, 'index'])->name('documentos.index');

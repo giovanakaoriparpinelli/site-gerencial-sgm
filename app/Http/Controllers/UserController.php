@@ -49,6 +49,22 @@ class UserController extends Controller
         return back()->with('status', 'Funcionário atualizado.');
     }
 
+    public function resetarSenha(Request $request, User $user): RedirectResponse
+    {
+        if ($user->id === $request->user()->id) {
+            return back()->withErrors(['usuario' => 'Para trocar a sua própria senha, use Perfil.']);
+        }
+
+        $senhaTemporaria = Str::password(10, symbols: false);
+
+        $user->forceFill([
+            'password' => Hash::make($senhaTemporaria),
+            'remember_token' => null,
+        ])->save();
+
+        return back()->with('status', "Senha de {$user->name} redefinida. Senha temporária: {$senhaTemporaria} — repasse e peça para trocar em Perfil no primeiro login.");
+    }
+
     public function destroy(Request $request, User $user): RedirectResponse
     {
         if ($user->id === $request->user()->id) {

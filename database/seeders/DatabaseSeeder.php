@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
         $contas = [
             ['name' => 'Mauro', 'email' => 'maurojrparpinelli.adv@gmail.com'],
             ['name' => 'Moacir', 'email' => 'moacirparpinelli@gmail.com'],
-            // E-mail da Giovana ainda nao confirmado - atualizar via tela de Perfil apos o primeiro login.
-            ['name' => 'Giovana', 'email' => 'giovana@sgmempresarial.com.br'],
+            // E-mail confirmado em 29/09/2026.
+            ['name' => 'Giovana', 'email' => 'giovanaparpinelli@sgmempresarial.com.br'],
         ];
 
         foreach ($contas as $conta) {

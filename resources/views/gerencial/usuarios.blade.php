@@ -37,6 +37,12 @@
         </button>
 
         @if ($usuario->id !== auth()->id())
+          <form method="POST" action="{{ route('usuarios.resetar-senha', $usuario) }}" onsubmit="return confirm('Redefinir a senha de {{ $usuario->name }}? Uma nova senha temporária será gerada e a atual deixa de funcionar.');">
+            @csrf
+            <button type="submit" class="icon-btn" title="Redefinir senha">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M16 7l3 3M14 9l2 2"/></svg>
+            </button>
+          </form>
           <form method="POST" action="{{ route('usuarios.destroy', $usuario) }}" onsubmit="return confirm('Remover {{ $usuario->name }}? As tarefas criadas por essa pessoa também serão removidas.');">
             @csrf
             @method('DELETE')
