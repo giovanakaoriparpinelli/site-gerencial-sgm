@@ -23,14 +23,23 @@ class DashboardController extends Controller
             ->orderBy('data_prevista')
             ->get();
 
-        $agendaHoje = Document::where('tipo', 'agenda')->whereDate('data', today())->first();
+        // Todas as agendas de hoje (pode haver mais de uma). Sem nenhuma, cai na
+        // agenda mais recente já cadastrada, sinalizada como "anterior" na tela.
+        $agendas = Document::where('tipo', 'agenda')->whereDate('data', today())->orderBy('id')->get();
+        $agendaAnterior = false;
+
+        if ($agendas->isEmpty()) {
+            $ultima = Document::where('tipo', 'agenda')->whereDate('data', '<', today())->orderByDesc('data')->orderByDesc('id')->first();
+            $agendas = $ultima ? collect([$ultima]) : collect();
+            $agendaAnterior = $ultima !== null;
+        }
 
         return view('dashboard', [
             'tarefas' => $tarefas,
             'usuarios' => User::orderBy('name')->get(),
             'hoje' => today(),
-            'agendaHoje' => $agendaHoje,
-            'pendenciasAgenda' => $agendaHoje ? $agendaHoje->itensChecklist() : [],
+            'agendas' => $agendas,
+            'agendaAnterior' => $agendaAnterior,
         ]);
     }
 }

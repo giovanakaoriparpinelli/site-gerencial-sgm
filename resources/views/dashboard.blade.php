@@ -23,12 +23,15 @@
   <div class="card" style="margin-top: 24px;">
     <h2 style="margin: 0 0 4px; font-size: 1rem;">Pendências da agenda de hoje</h2>
 
-    @if ($agendaHoje)
+    @forelse ($agendas as $agendaHoje)
       <p style="margin: 0 0 14px; font-size: 0.82rem; color: var(--ink-faint);">
         <a href="{{ route('documentos.show', $agendaHoje) }}" style="color: var(--accent);">{{ $agendaHoje->titulo }}</a>
+        @if ($agendaAnterior)
+          — agenda anterior ({{ $agendaHoje->data->format('d/m/Y') }}); ainda não há agenda cadastrada para hoje
+        @endif
       </p>
 
-      @forelse ($pendenciasAgenda as $item)
+      @forelse ($agendaHoje->itensChecklist() as $item)
         <div style="display: flex; align-items: center; gap: 12px; padding: 10px 0; {{ !$loop->last ? 'border-bottom: 1px solid var(--border);' : '' }}">
           <form method="POST" action="{{ route('documentos.checklist', [$agendaHoje, $item['indice']]) }}">
             @csrf
@@ -50,10 +53,10 @@
           @endif
         </div>
       @empty
-        <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">A agenda de hoje não tem itens de checklist.</p>
+        <p style="color: var(--ink-faint); margin: 0 0 14px; font-size: 0.9rem;">Esta agenda não tem itens de checklist.</p>
       @endforelse
-    @else
-      <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">Nenhuma agenda cadastrada para hoje ainda. Suba a agenda do dia em Atas e Agendas.</p>
-    @endif
+    @empty
+      <p style="color: var(--ink-faint); margin: 0; font-size: 0.9rem;">Nenhuma agenda cadastrada ainda. Suba a agenda do dia em Atas e Agendas.</p>
+    @endforelse
   </div>
 @endsection

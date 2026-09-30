@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['tipo', 'data', 'titulo', 'conteudo', 'created_by'])]
 class Document extends Model
 {
+    /** Item de checklist: "- [ ] texto", aceitando também "*"/"+" e indentação. */
+    private const PADRAO_CHECKLIST = '/^\s*[-*+]\s+\[( |x|X)\]\s+(.*)$/m';
+
     protected function casts(): array
     {
         return [
@@ -28,7 +31,7 @@ class Document extends Model
      */
     public function itensChecklist(): array
     {
-        preg_match_all('/^-\s+\[( |x|X)\]\s+(.*)$/m', $this->conteudo, $m);
+        preg_match_all(self::PADRAO_CHECKLIST, $this->conteudo, $m);
 
         $itens = [];
         foreach ($m[1] as $i => $marca) {
@@ -45,14 +48,14 @@ class Document extends Model
     public function alternarItemChecklist(int $indice): void
     {
         $contador = -1;
-        $novoConteudo = preg_replace_callback('/^-\s+\[( |x|X)\]\s+(.*)$/m', function ($m) use ($indice, &$contador) {
+        $novoConteudo = preg_replace_callback(self::PADRAO_CHECKLIST, function ($m) use ($indice, &$contador) {
             $contador++;
             if ($contador !== $indice) {
                 return $m[0];
             }
             $novaMarca = strtolower($m[1]) === 'x' ? ' ' : 'x';
 
-            return '- ['.$novaMarca.'] '.$m[2];
+            return preg_replace('/\[( |x|X)\]/', '['.$novaMarca.']', $m[0], 1);
         }, $this->conteudo);
 
         $this->update(['conteudo' => $novoConteudo]);
