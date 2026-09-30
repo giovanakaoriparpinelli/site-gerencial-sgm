@@ -13,13 +13,8 @@ class DashboardController extends Controller
     public function index(Request $request): View
     {
         $tarefas = Task::with(['criador', 'responsavel'])
-            ->where(function ($q) {
-                $q->where('concluida', false)->whereDate('data_prevista', '<=', today());
-            })
-            ->orWhere(function ($q) {
-                $q->where('concluida', true)->whereDate('concluida_em', today());
-            })
-            ->orderBy('concluida')
+            ->where('concluida', false)
+            ->whereDate('data_prevista', '<=', today())
             ->orderBy('data_prevista')
             ->get();
 
